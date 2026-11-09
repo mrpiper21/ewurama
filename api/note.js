@@ -26,9 +26,14 @@ export default async function handler(req, res) {
         sent: String(body.sent || new Date().toISOString()).slice(0, 80),
       }),
     })
-    const data = await r.json().catch(() => ({}))
+    const text = await r.text()
+    let data = {}
+    try {
+      data = JSON.parse(text)
+    } catch {}
     const ok = r.ok && String(data.success) === 'true'
-    return res.status(ok ? 200 : 502).json({ success: ok, message: data.message || '' })
+    // on failure, report the mail service's status (never the address) so problems are diagnosable
+    return res.status(ok ? 200 : 502).json({ success: ok, message: data.message || '', upstream: ok ? undefined : r.status, detail: ok ? undefined : text.replace(/\s+/g, ' ').slice(0, 160) })
   } catch (e) {
     return res.status(502).json({ success: false, message: 'Could not reach the mail service' })
   }
