@@ -198,3 +198,72 @@ export function moonDisk(N, c, r) {
   }
   return out
 }
+
+// 04 — a smile like sunrise: the sun lifting out of a still sea, its light running toward us
+export function sunrise(N) {
+  const p = new Float32Array(N * 3), ord = new Float32Array(N)
+  const C = [0, 0.15, -14], r = 2.6, H = -0.35
+  for (let i = 0; i < N; i++) {
+    const u = R()
+    let x, y, z
+    if (u < 0.38) {
+      // the disc, above the horizon
+      do {
+        const a = R() * Math.PI * 2, rr = Math.sqrt(R()) * r
+        x = C[0] + Math.cos(a) * rr
+        y = C[1] + Math.sin(a) * rr
+      } while (y < H)
+      z = C[2]
+      ord[i] = 0.5 * R()
+    } else if (u < 0.62) {
+      // rays
+      const k = Math.floor(R() * 13)
+      const a = (k / 12) * Math.PI + g() * 0.012
+      const rr = r * (1.12 + Math.pow(R(), 1.5) * 1.9)
+      x = C[0] + Math.cos(a) * rr
+      y = Math.max(H, C[1] + Math.sin(a) * rr)
+      z = C[2] - 0.3
+      ord[i] = 0.4 + 0.4 * R()
+    } else if (u < 0.72) {
+      // the horizon line
+      x = (R() - 0.5) * 34
+      y = H + g() * 0.02
+      z = C[2] + 0.2
+      ord[i] = R()
+    } else {
+      // the sun's road across the water, glittering toward us
+      const d = R()
+      z = C[2] + 0.4 + d * 16
+      x = g() * (0.5 + d * 2.4)
+      y = H - 0.15 - d * 1.1
+      ord[i] = 0.3 + 0.7 * d
+    }
+    p[i * 3] = x
+    p[i * 3 + 1] = y
+    p[i * 3 + 2] = z
+  }
+  return { p, ord }
+}
+
+// 05 — an open book of stars: the story of you, which I want to read
+export function book(N) {
+  const p = new Float32Array(N * 3), ord = new Float32Array(N)
+  const W = 2.1, D = 2.8, cz = -1.2, cy = -0.4
+  for (let i = 0; i < N; i++) {
+    const side = i % 2 ? 1 : -1
+    let u = R(), v = R()
+    const edge = R() < 0.3
+    if (edge) {
+      if (R() < 0.5) u = R() < 0.5 ? 0.02 : 1
+      else v = R() < 0.5 ? 0 : 1
+    }
+    // pages lift from the spine and curl at the edge; a few lines of "text"
+    const lift = Math.sin(Math.min(1, u * 1.4) * Math.PI * 0.5) * 0.42 - u * u * 0.18
+    const line = !edge && u > 0.12 && u < 0.9 && Math.abs(((v * 14) % 1) - 0.5) < 0.12
+    p[i * 3] = side * (0.05 + u * W)
+    p[i * 3 + 1] = cy + lift + (line ? 0.01 : 0) + g() * 0.006
+    p[i * 3 + 2] = cz + (v - 0.5) * D
+    ord[i] = u
+  }
+  return { p, ord }
+}

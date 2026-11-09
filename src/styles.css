@@ -428,3 +428,44 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .question .q-big { font-size: clamp(52px, 7.5vw, 104px); }
 .question .q-kicker { font-size: 14px; }
 @media (max-width: 700px) { .question .q-line { font-size: clamp(18px, 5vw, 23px); } }
+
+/* ── Mobile: made for a phone held in one hand ────────────────────────────── */
+@media (max-width: 700px), (max-aspect-ratio: 3/4) {
+  .app { height: 100dvh; }
+  /* a slim letterbox that respects the notch, no wasted black */
+  .bar.top.on { height: calc(env(safe-area-inset-top, 0px) + 3vh); }
+  .bar.bottom.on { height: 0; }
+  /* captions sit in a full-width band at the bottom, like a film on a phone */
+  .subtitle {
+    left: 0; right: 0; transform: none; width: 100%; border-radius: 0;
+    bottom: 0;
+    padding: 44px 20px calc(env(safe-area-inset-bottom, 0px) + 78px);
+    background: linear-gradient(to top, rgba(6, 2, 14, 0.97) 0%, rgba(6, 2, 14, 0.9) 62%, rgba(6, 2, 14, 0) 100%);
+  }
+  .sub-chapter { font-size: 12px; letter-spacing: 0.26em; margin-bottom: 10px; }
+  .sub-text { font-size: clamp(21px, 5.7vw, 26px); line-height: 1.36; }
+  .dropcap { font-size: 1.9em; }
+  .btn-next {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); right: 16px;
+    min-height: 48px; padding: 14px 22px; font-size: 12px; background: rgba(40, 14, 70, 0.55);
+  }
+  .reel { bottom: calc(env(safe-area-inset-bottom, 0px) + 40px); left: 20px; }
+  .reel span { width: 12px; height: 3px; }
+  .mute { top: calc(env(safe-area-inset-top, 0px) + 10px); right: 12px; width: 44px; height: 44px; }
+  .question { padding: 0 18px calc(env(safe-area-inset-bottom, 0px) + 28px); }
+  .question::before { height: 70dvh; }
+  .question .q-line { font-size: clamp(18px, 5vw, 22px); }
+  .question .q-big { font-size: clamp(46px, 13vw, 60px); }
+  .q-buttons { gap: 14px; }
+  .btn-yes, .btn-no { min-height: 52px; }
+  .c-bottom { bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); padding: 0 18px; }
+  .c-line { font-size: clamp(19px, 5.4vw, 24px) !important; }
+  .c-line.soft { font-size: clamp(16px, 4.4vw, 19px) !important; }
+  .tc-once { font-size: clamp(24px, 7vw, 32px); }
+  .swipe-hint { display: block; }
+}
+.swipe-hint {
+  display: none; position: absolute; z-index: 8; left: 50%; transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 6px); font-family: var(--sans); font-size: 10px;
+  letter-spacing: 0.3em; text-transform: uppercase; color: rgba(230, 210, 255, 0.45); pointer-events: none;
+}

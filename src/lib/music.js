@@ -12,11 +12,26 @@ const CHORDS = [
   { bass: 45, pad: [57, 62, 64, 69, 71], mel: [69, 71, 74, 76, 81, 83], harp: [45, 52, 57, 62, 64, 69, 76] },
 ]
 
+// The theme: "Until I Found You" — Stephen Sanchez. Played softly underneath the story.
+const TRACK = '/music/until-i-found-you.mp3'
+const LEVEL = { tender: 0.42, joy: 0.75 }
+
 export class LoveSong {
   constructor() {
     this.started = false
     this.muted = false
     this.mood = 'tender'
+    // create the element up front so it can start inside her tap (required on phones)
+    if (typeof Audio !== 'undefined') {
+      this.audio = new Audio(TRACK)
+      this.audio.loop = true
+      this.audio.preload = 'auto'
+      this.audio.addEventListener('error', () => (this.audio = null))
+    }
+  }
+
+  get hasTrack() {
+    return !!this.audio
   }
 
   start() {
@@ -41,6 +56,20 @@ export class LoveSong {
     this.dry.gain.value = 0.55
     this.dry.connect(this.master)
     this.dry.connect(this.reverb)
+
+    if (this.audio) {
+      // the song, kept soft and a little warm (gentle low-pass) so the story stays in front
+      this.audio.play().catch(() => {})
+      const src = ctx.createMediaElementSource(this.audio)
+      this.trackTone = ctx.createBiquadFilter()
+      this.trackTone.type = 'lowpass'
+      this.trackTone.frequency.value = 6500
+      this.trackGain = ctx.createGain()
+      this.trackGain.gain.value = 0
+      this.trackGain.gain.linearRampToValueAtTime(LEVEL.tender, ctx.currentTime + 6)
+      src.connect(this.trackTone).connect(this.trackGain).connect(this.master)
+      return
+    }
 
     // tape-style echo for the music box
     this.delay = ctx.createDelay(2)
@@ -167,7 +196,7 @@ export class LoveSong {
 
   // a little glittery flourish for magical moments
   sparkle(count = 7) {
-    if (!this.started || this.muted) return
+    if (!this.started || this.muted || this.audio) return
     const t = this.ctx.currentTime
     const notes = [86, 90, 93, 97, 98, 102, 105]
     for (let i = 0; i < count; i++) this.bell(t + i * 0.07, NOTE(notes[i % notes.length]), 0.045)
@@ -183,7 +212,7 @@ export class LoveSong {
       o.frequency.exponentialRampToValueAtTime(38, t + d + 0.18)
       const g = ctx.createGain()
       g.gain.setValueAtTime(0, t + d)
-      g.gain.linearRampToValueAtTime(i ? 0.25 : 0.4, t + d + 0.012)
+      g.gain.linearRampToValueAtTime((i ? 0.25 : 0.4) * (this.audio ? 0.55 : 1), t + d + 0.012)
       g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.25)
       o.connect(g).connect(this.master)
       o.start(t + d)
@@ -193,6 +222,13 @@ export class LoveSong {
 
   setMood(m) {
     this.mood = m
+    if (this.trackGain) {
+      const now = this.ctx.currentTime
+      this.trackGain.gain.cancelScheduledValues(now)
+      this.trackGain.gain.setValueAtTime(this.trackGain.gain.value, now)
+      this.trackGain.gain.linearRampToValueAtTime(LEVEL[m] ?? LEVEL.tender, now + 3)
+      this.trackTone.frequency.setTargetAtTime(m === 'joy' ? 18000 : 6500, now, 1)
+    }
   }
 
   toggleMute() {

@@ -39,7 +39,10 @@ export default function App() {
   useEffect(() => {
     const w = new Stardust(mount.current, { onProgress: setProgress })
     world.current = w
-    if (import.meta.env.DEV) window.__world = w
+    if (import.meta.env.DEV) {
+      window.__world = w
+      window.__song = song
+    }
     let alive = true
     w.ready.then(() => alive && setReady(true)).catch((e) => console.error(e))
     return () => {
@@ -86,7 +89,25 @@ export default function App() {
       if (e.key === 'ArrowLeft' && step > 0 && step < Q) setStep((s) => s - 1)
     }
     addEventListener('keydown', onKey)
-    return () => removeEventListener('keydown', onKey)
+    // on a phone: swipe left for the next scene, right to go back
+    let sx = 0, sy = 0
+    const onStart = (e) => {
+      sx = e.touches[0].clientX
+      sy = e.touches[0].clientY
+    }
+    const onEnd = (e) => {
+      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return
+      if (dx < 0) next()
+      else if (step > 0 && step < Q) setStep((s) => s - 1)
+    }
+    addEventListener('touchstart', onStart, { passive: true })
+    addEventListener('touchend', onEnd, { passive: true })
+    return () => {
+      removeEventListener('keydown', onKey)
+      removeEventListener('touchstart', onStart)
+      removeEventListener('touchend', onEnd)
+    }
   }, [next, step])
 
   const onEnvelope = (phase) => {

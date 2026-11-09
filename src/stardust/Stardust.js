@@ -78,10 +78,10 @@ export class Stardust {
       heart: S.heart(N, [0, 1.6, -2.4], 1.7, 0.4),
       twin: S.twinHearts(N, this.dust.userData.seeds, [0, 2.6, -3], 1.25),
       name: await S.name(N, 'Ewurama', [0, 3.3, -1.5], 4.2),
-      thoughts: await S.text(N, 'your thoughts', [0, 2.75, -0.6], 2.3),
-      dreams: await S.text(N, 'your dreams', [0, 2.75, -0.6], 2.1),
-      habits: await S.text(N, 'your little habits', [0, 2.75, -0.6], 2.6),
-      you: await S.text(N, 'all that makes you, you', [0, 2.8, -0.6], 3.2),
+      thoughts: await S.text(N, 'your thoughts', [0, 1.75, -1.2], 2.3),
+      dreams: await S.text(N, 'your dreams', [0, 1.75, -1.2], 2.1),
+      habits: await S.text(N, 'your little habits', [0, 1.75, -1.2], 2.6),
+      you: await S.text(N, 'all that makes you, you', [0, 1.8, -1.2], 3.2),
     }
 
     const comp = (this.composer = new EffectComposer(r))
@@ -165,12 +165,13 @@ export class Stardust {
     this.blendFrom = { pos: this.camera.position.clone(), look: this.look.clone() }
     this.blendDur = sc.blend ?? 4
     this.baseline()
+    this.tween(this.du.uSize, 0.016, 3)
     sc.enter?.(this)
   }
 
   loop(now) {
     this.raf = requestAnimationFrame(this.loop)
-    const dt = Math.min(0.05, (now - this.last) / 1000)
+    const dt = Math.max(0, Math.min(0.05, (now - this.last) / 1000))
     this.last = now
     this.t += dt
     this.sceneTime += dt
@@ -199,7 +200,13 @@ export class Stardust {
     const k = ease(Math.min(1, st / this.blendDur))
     const pos = this.blendFrom.pos.clone().lerp(shot.pos, k)
     const look = this.blendFrom.look.clone().lerp(shot.look, k)
-    if (this.portraitMode) pos.z += shot.pz ?? 2.2
+    if (this.portraitMode) {
+      pos.z += shot.pz ?? 2.2
+      // on a tall phone the captions own the bottom third: lift the picture into the top of the frame
+      const lift = shot.lift ?? Math.min(0.9, pos.distanceTo(look) * 0.12)
+      pos.y -= lift
+      look.y -= lift
+    }
     this.camera.position.copy(pos)
     this.look.copy(look)
     this.camera.lookAt(look)
@@ -238,28 +245,22 @@ const SCENES = {
     cam: (w, t) => ({ pos: V(Math.sin(t * 0.03) * 3, 4.5, 16 - Math.min(t, 40) * 0.05), look: V(0, 1, -6), parallax: 2 }),
   },
 
-  // 01 — a diamond, found where I never thought to look… and then, out of the stars, you
+  // 01 — a diamond, found where I never thought to look: born out of a turning galaxy
   0: {
     blend: 7,
     enter(w) {
-      w.set({ uAssemble: 0 }, 0)
-      w.shapes.diamond = S.diamond(w.dust.userData.N, [CHEST.x, CHEST.y + 0.2, 1.4], 0.4)
-      w.gather('diamond', { spin: 0.35, center: V(CHEST.x, CHEST.y + 0.2, 1.4), dur: 4.5 })
-      w.set({ uBright: 0.8, uColA: new THREE.Color(0.85, 0.9, 1.0), uColB: new THREE.Color(0.9, 0.7, 1.0), uLightPos: V(CHEST.x, CHEST.y + 0.2, 1.6), uLightCol: new THREE.Color(0.9, 0.9, 1.1) }, 3)
+      w.world(null, { fade: 3 })
+      w.set({ uAssemble: 0 }, 4)
+      const c = V(0, 1.15, 0.5)
+      w.shapes.diamond = S.diamond(w.dust.userData.N, [c.x, c.y, c.z], 0.85)
+      w.gather('diamond', { spin: 0.3, center: c, dur: 6 })
+      w.tween(w.du.uSize, 0.024, 3)
+      w.set({ uBright: 1.1, uColA: C(0.85, 0.9, 1.0), uColB: C(0.9, 0.7, 1.0) }, 3)
     },
-    beats: [
-      [3.5, (w) => w.set({ uAssemble: 1 }, 9)],
-      [9, (w) => {
-        const c = V(1.25, FACE.y + 0.55, 0.6)
-        w.shapes.diamond2 = S.diamond(w.dust.userData.N, [c.x, c.y, c.z], 0.2)
-        w.dust.userData.to(w.shapes.diamond2, { spin: 0.4, center: c, dur: 4 })
-        w.set({ uBright: 0.55, uLightPos: c.clone().add(V(0, 0, 1.5)) }, 4)
-      }],
-      [14, (w) => w.set({ uLightPos: V(-2, 2.6, 3), uLightCol: new THREE.Color(1.0, 0.86, 0.78) }, 5)],
-    ],
+    beats: [[8, (w) => w.set({ uBright: 1.5 }, 4)]],
     cam: (w, t) => {
-      const a = Math.min(1, t / 14)
-      return { pos: V(0.6 - a * 1.0 + Math.sin(t * 0.1) * 0.2, 1.0 + a * 0.2, 9.5 - ease(a) * 3.2), look: V(0, 0.6 + a * 0.2, 0) }
+      const a = ease(Math.min(1, t / 20))
+      return { pos: V(Math.sin(t * 0.06) * 1.2, 2.6 - a * 1.2, 12 - a * 7), look: V(0, 1.1, -2 + a * 2), pz: 2.5 }
     },
   },
 
@@ -286,31 +287,32 @@ const SCENES = {
     cam: (w, t) => ({ pos: V(-1.6 + Math.min(t, 30) * 0.08, 1.15, 6.8), look: V(0, 0.9, -1.5), pz: 2.5 }),
   },
 
-  // 04 — your smile: she returns, and a sunrise opens behind her
+  // 04 — your smile: warmth like a sunrise, lifting out of a still sea
   3: {
     blend: 5,
     enter(w) {
-      w.world(null, { fade: 5 })
-      w.set({ uAssemble: 1, uWarm: 0.8, uRim: 1.2, uRimCol: C(1.0, 0.72, 0.4), uLightPos: V(0.4, 2.2, 2.5), uLightCol: C(1.2, 0.95, 0.7), uColA: C(1.0, 0.8, 0.45), uColB: C(1.0, 0.6, 0.35), uBright: 1.0 }, 3.5)
-      w.gather('halo', { spin: 0, wander: 0, dur: 5 })
+      w.world(Wd.sunrise(w.her.userData.count), { size: 1.6, fade: 7, dur: 7 })
+      w.set({ uAltA: C(1.0, 0.72, 0.36), uAltB: C(1.0, 0.5, 0.42), uAltY: new THREE.Vector2(-1.6, 3), uAltGain: 1.8, uBright: 0.7, uColA: C(1.0, 0.8, 0.5), uColB: C(1.0, 0.65, 0.75) }, 4)
+      w.gather('home', { wander: 1, dur: 5 })
+      w.night.userData.sky.material.uniforms.uTint.value.set(1, 1, 1)
     },
-    cam: (w, t) => ({ pos: V(0.15, MOUTH.y + 0.08, 3.3 - Math.min(t, 18) * 0.03), look: V(MOUTH.x + 0.02, MOUTH.y + 0.08, 0), pz: 1 }),
+    cam: (w, t) => ({ pos: V(Math.sin(t * 0.05) * 0.4, 0.55 + Math.min(t, 24) * 0.012, 7.5 - Math.min(t, 24) * 0.08), look: V(0, 0.7, -14), pz: 2 }),
   },
 
-  // 05 — beyond the beauty: inside her silhouette, a whole universe — and the stars write what I want to know
+  // 05 — beyond the beauty: an open book of stars — the story of you — and the words rise from its pages
   4: {
     blend: 5,
     enter(w) {
-      w.world(null, { fade: 3 })
-      w.set({ uAssemble: 1, uCosmos: 1, uBright: 1.0, uColA: C(1.0, 0.85, 0.6), uColB: C(0.8, 0.65, 1.0) }, 4)
+      w.world(Wd.book(w.her.userData.count), { size: 1.3, fade: 6, dur: 6 })
+      w.set({ uAltA: C(0.9, 0.8, 1.0), uAltB: C(1.0, 0.82, 0.55), uAltY: new THREE.Vector2(-0.6, 0.2), uAltGain: 0.9, uBright: 1.1, uColA: C(1.0, 0.85, 0.6), uColB: C(0.8, 0.65, 1.0) }, 4)
       w.gather('thoughts', { dur: 3.5 })
     },
     beats: [
       [5.5, (w) => w.gather('dreams', { dur: 3.5 })],
       [10, (w) => w.gather('habits', { dur: 3.5 })],
-      [14.5, (w) => { w.gather('you', { dur: 4 }); w.set({ uCosmos: 0 }, 6) }],
+      [14.5, (w) => w.gather('you', { dur: 4 })],
     ],
-    cam: (w, t) => ({ pos: orbit(V(0, 1.0, 0), 7.2, 0.4 - Math.min(t, 22) * 0.03, 0.5), look: V(0, 1.15, 0), pz: 3 }),
+    cam: (w, t) => ({ pos: V(Math.sin(t * 0.05) * 0.8, 3.6 - Math.min(t, 22) * 0.02, 9 - Math.min(t, 22) * 0.06), look: V(0, 0.2, -1.2), pz: 1.5 }),
   },
 
   // 06 — taking a chance: her light becomes a bridge, built one step at a time across the dark, toward the moon
@@ -385,12 +387,15 @@ const SCENES = {
   question: {
     blend: 5,
     enter(w) {
-      w.world(null, { fade: 5 })
-      w.set({ uAssemble: 1, uWarm: 0.25, uRelight: 0.85, uLightPos: V(0, 2.2, 3), uColA: C(1.0, 0.55, 0.75), uColB: C(0.85, 0.45, 1.0), uBright: 1.15, uExposure: 0.95 }, 3)
+      w.world(null, { fade: 4 })
+      w.set({ uAssemble: 0 }, 0)
+      w.set({ uWarm: 0.25, uRelight: 0.85, uLightPos: V(0, 2.2, 3), uColA: C(1.0, 0.55, 0.75), uColB: C(0.85, 0.45, 1.0), uBright: 1.15, uExposure: 0.95 }, 3)
       w.dust.userData.to(S.heart(w.dust.userData.N, [0, 1.25, -2.2], 2.1, 0.5), { dur: 5 })
       w.du.uPulseC.value.set(0, 1.25, -2.2)
     },
-    cam: (w, t) => ({ pos: V(0, 1.15, 7.2 - Math.min(t, 30) * 0.03), look: V(0, 1.15, 0), pz: 3 }),
+    // the reveal: for the first time, out of all that light — you
+    beats: [[2.5, (w) => w.tween(w.pu.uAssemble, 1, 9)]],
+    cam: (w, t) => ({ pos: V(0, 1.15, 7.2 - Math.min(t, 30) * 0.03), look: V(0, 1.15, 0), pz: 6, lift: 2.6 }),
   },
 
   // yes: she bursts into fireworks of light, and the sky writes her name
