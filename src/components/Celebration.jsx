@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Whisper } from './Chapter'
 import NoteToMe from './NoteToMe'
@@ -5,6 +6,7 @@ import NoteToMe from './NoteToMe'
 const ease = [0.16, 1, 0.3, 1]
 
 export default function Celebration({ onReplay }) {
+  const [noteSent, setNoteSent] = useState(false)
   const today = new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
   return (
     <motion.section className="celebration" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5 }}>
@@ -18,10 +20,12 @@ export default function Celebration({ onReplay }) {
         <p className="c-line soft">
           <Whisper text="Thank you for taking a chance on us. I promise to take good care of your heart. 💜" delay={8.2} step={0.07} />
         </p>
-        <NoteToMe delay={12} />
-        <motion.button className="btn-ghost" onClick={onReplay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 15, duration: 1.5 }}>
-          ↺ relive our story
-        </motion.button>
+        <NoteToMe delay={12} onSent={() => setNoteSent(true)} />
+        {noteSent && (
+          <motion.button className="btn-ghost" onClick={onReplay} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 1.5 }}>
+            ↺ relive our story
+          </motion.button>
+        )}
       </div>
     </motion.section>
   )

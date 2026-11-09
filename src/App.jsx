@@ -4,6 +4,7 @@ import Envelope from './components/Envelope'
 import { Whisper, readTime } from './components/Chapter'
 import Question from './components/Question'
 import Celebration from './components/Celebration'
+import { sendYes } from './lib/note'
 import Fireworks from './components/Fireworks'
 import { song } from './lib/music'
 import { Stardust } from './stardust/Stardust'
@@ -167,7 +168,7 @@ export default function App() {
             </motion.p>
           </motion.div>
         )}
-        {step === Q && <Question key="q" onYes={() => setStep(YES)} onNoAttempt={() => song.sparkle(2)} />}
+        {step === Q && <Question key="q" onYes={() => { sendYes(); setStep(YES) }} onNoAttempt={() => song.sparkle(2)} />}
         {step === YES && <Celebration key="c" onReplay={replay} />}
       </AnimatePresence>
 
