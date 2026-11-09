@@ -469,3 +469,45 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   bottom: calc(env(safe-area-inset-bottom, 0px) + 6px); font-family: var(--sans); font-size: 10px;
   letter-spacing: 0.3em; text-transform: uppercase; color: rgba(230, 210, 255, 0.45); pointer-events: none;
 }
+
+/* ── a note back to me ───────────────────────────────────────────────────── */
+.note { width: min(560px, 100%); pointer-events: auto; }
+.note-card {
+  padding: 20px 22px 18px; border-radius: 20px; text-align: center;
+  background: linear-gradient(160deg, rgba(60, 22, 104, 0.72), rgba(22, 8, 44, 0.82));
+  border: 1px solid rgba(217, 184, 255, 0.28);
+  box-shadow: 0 20px 60px rgba(10, 2, 24, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.note-card.sent { border-color: rgba(255, 211, 138, 0.45); }
+.note-q { font-family: var(--serif); font-weight: 600; font-size: clamp(20px, 2.1vw, 26px); color: #fff8ee; margin: 0 0 14px; }
+.note-card.sent .note-q { margin: 0; }
+.note-text {
+  width: 100%; box-sizing: border-box; resize: vertical; min-height: 110px;
+  padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(217, 184, 255, 0.35);
+  background: rgba(8, 3, 18, 0.55); color: #fffaf2; outline: none;
+  font-family: var(--serif); font-size: 19px; line-height: 1.45;
+}
+.note-text:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255, 211, 138, 0.18); }
+.note-text::placeholder { color: rgba(217, 184, 255, 0.5); font-style: italic; }
+.note-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.note-btn {
+  min-height: 46px; padding: 12px 22px; border-radius: 999px; cursor: pointer;
+  font-family: var(--sans); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--lilac); background: transparent; border: 1px solid rgba(217, 184, 255, 0.35);
+}
+.note-btn.primary { color: #fff; border: none; background: linear-gradient(135deg, #8b3dff, #e0559f); box-shadow: 0 8px 26px rgba(170, 70, 255, 0.45); }
+.note-btn:disabled { opacity: 0.5; cursor: default; }
+.note-err { font-family: var(--sans); font-size: 14px; color: #ffc2d0; margin: 10px 0 0; }
+.note-err a { color: var(--gold); }
+.note-pill {
+  margin: 0 auto; display: block; padding: 10px 20px; border-radius: 999px; cursor: pointer;
+  font-family: var(--sans); font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--lilac); background: rgba(40, 14, 70, 0.5); border: 1px solid rgba(217, 184, 255, 0.3);
+}
+@media (max-width: 700px) {
+  .note-card { padding: 16px 14px 14px; border-radius: 18px; }
+  .note-q { font-size: 19px; margin-bottom: 10px; }
+  .note-text { font-size: 17px; min-height: 96px; }
+  .note-btn { flex: 1 1 auto; font-size: 12px; padding: 12px 14px; }
+}

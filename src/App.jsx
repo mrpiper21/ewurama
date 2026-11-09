@@ -16,7 +16,8 @@ const CHAPTERS = [
   { n: '05', title: 'Beyond the beauty', quote: 'We haven’t spoken much, but somehow, I’m already curious about the person behind that beautiful face. I want to know your thoughts, your dreams, your little habits, and all the things that make you who you are.' },
   { n: '06', title: 'Taking a chance', quote: 'I want to try this beautiful thing called a relationship with you. Not because I think everything will always be perfect, but because I think some things are worth taking a chance on.' },
   { n: '07', title: 'The little things', quote: 'I want to experience your happiness, your anger, your random conversations, your laughter, and even your quiet moments. I want to be someone you can share both the beautiful and difficult days with.' },
-  { n: '08', title: 'Being a team', quote: 'I want us to be a team. To encourage each other, learn from each other, grow together, and create memories that we’ll look back on and smile about.' },
+  { n: '08', title: 'Protecting you', quote: 'I want to protect you — your heart, your peace, and that beautiful smile. Not to hold you back or change who you are, but to be a safe place you can always run to; someone who stands with you when the world gets loud, and holds you close when it all feels like too much.' },
+  { n: '09', title: 'Being a team', quote: 'I want us to be a team. To encourage each other, learn from each other, grow together, and create memories that we’ll look back on and smile about.' },
 ]
 const Q = CHAPTERS.length
 const YES = Q + 1
@@ -160,9 +161,6 @@ export default function App() {
       <AnimatePresence mode="wait">
         {inChapter && (
           <motion.div key={step} className="subtitle" exit={{ opacity: 0, filter: 'blur(10px)' }} transition={{ duration: 1 }}>
-            <motion.div className="sub-chapter" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1, duration: 1.6 }}>
-              <span>{CHAPTERS[step].n}</span> {CHAPTERS[step].title}
-            </motion.div>
             <motion.p className="sub-text" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: SUB_DELAY - 0.6, duration: 1 }}>
               <span className="dropcap">{CHAPTERS[step].quote[0]}</span>
               <Whisper text={CHAPTERS[step].quote.slice(1)} delay={SUB_DELAY} step={0.06} />

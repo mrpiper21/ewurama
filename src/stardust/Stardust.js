@@ -366,8 +366,21 @@ const SCENES = {
     },
   },
 
-  // 08 — a team: two strands of light rise, winding around each other… and become one heart
+  // 08 — protecting you: wings of light open wide and fold around a small, glowing heart
   7: {
+    blend: 5,
+    enter(w) {
+      w.world(Wd.wings(w.her.userData.count), { size: 1.5, fade: 7, dur: 7 })
+      w.set({ uAltA: C(1.0, 0.9, 0.75), uAltB: C(0.82, 0.68, 1.0), uAltY: new THREE.Vector2(-0.8, 2.8), uAltGain: 1.5, uAltWave: 0.12, uBright: 1.2, uColA: C(1.0, 0.55, 0.75), uColB: C(1.0, 0.7, 0.6) }, 4)
+      w.dust.userData.to(S.heart(w.dust.userData.N, [0, 0.95, -0.4], 0.45, 0.12), { dur: 6 })
+      w.du.uPulseC.value.set(0, 0.95, -0.4)
+    },
+    beats: [[7, (w) => w.beat()], [8.2, (w) => w.beat()], [14, (w) => w.beat()], [15.2, (w) => w.beat()]],
+    cam: (w, t) => ({ pos: V(Math.sin(t * 0.05) * 0.7, 1.1, 8.6 - Math.min(t, 24) * 0.07), look: V(0, 1.15, -1), pz: 3.5 }),
+  },
+
+  // 09 — a team: two strands of light rise, winding around each other… and become one heart
+  8: {
     blend: 5,
     enter(w) {
       w.world(Wd.helix(w.her.userData.count), { size: 1.6, fade: 6, dur: 6 })

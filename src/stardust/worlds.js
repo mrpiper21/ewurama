@@ -267,3 +267,35 @@ export function book(N) {
   }
   return { p, ord }
 }
+
+// 08 — protecting you: two great wings of light, curving forward to shelter what's between them
+export function wings(N) {
+  const p = new Float32Array(N * 3), ord = new Float32Array(N)
+  const F = 30 // feathers per wing
+  for (let i = 0; i < N; i++) {
+    const side = i % 2 ? 1 : -1
+    const lead = R() < 0.14
+    const layer = R() < 0.65 ? 0 : 1 // long flight feathers, then shorter coverts on top
+    const t = lead ? R() : (Math.floor(R() * F) + 0.5) / F
+    // the wing's bone: rising out from the shoulder, then arching over
+    const bx = 0.35 + t * 2.5
+    const by = 1.55 + Math.sin(t * Math.PI * 0.8) * 1.05 - t * 0.25
+    let x, y
+    if (lead) {
+      x = bx
+      y = by + g() * 0.02
+    } else {
+      // feathers hang down near the body and sweep outward toward the tip
+      const phi = 0.12 + Math.pow(t, 1.4) * 1.25
+      const L = (0.65 + 1.9 * Math.pow(t, 0.9) * (1 - 0.25 * t)) * (layer ? 0.5 : 1)
+      const s = Math.pow(R(), 0.8)
+      x = bx + Math.sin(phi) * L * s + g() * 0.01
+      y = by - Math.cos(phi) * L * s + g() * 0.01
+    }
+    p[i * 3] = side * x
+    p[i * 3 + 1] = y
+    p[i * 3 + 2] = -1 + Math.pow(x / 3, 1.6) * 1.6 + layer * 0.04 // wrap forward, around her heart
+    ord[i] = 1 - Math.min(1, x / 3.2) // they open from the body outward
+  }
+  return { p, ord }
+}
