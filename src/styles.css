@@ -511,3 +511,4 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .note-text { font-size: 17px; min-height: 96px; }
   .note-btn { flex: 1 1 auto; font-size: 12px; padding: 12px 14px; }
 }
+.note-link { background: none; border: none; padding: 0; color: var(--gold); text-decoration: underline; cursor: pointer; font: inherit; }

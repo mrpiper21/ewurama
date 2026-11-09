@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { sendNote, mailtoLink } from '../lib/note'
+import { sendNote } from '../lib/note'
 
 const ease = [0.16, 1, 0.3, 1]
 
@@ -53,7 +53,10 @@ export default function NoteToMe({ delay = 12 }) {
             />
             {state === 'error' && (
               <p className="note-err">
-                It didn’t go through. Try again, or <a href={mailtoLink(text)}>send it from your mail app</a>.
+                It didn’t go through — please try again in a moment.{' '}
+                <button type="button" className="note-link" onClick={() => navigator.clipboard?.writeText(text)}>
+                  Copy my note
+                </button>
               </p>
             )}
             <div className="note-actions">
